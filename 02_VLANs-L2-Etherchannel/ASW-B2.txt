@@ -1,0 +1,32 @@
+! 3. Configure all links between Access and Distribution switches, including the EtherChannels, as trunk links.
+! a. Explicitly disable DTP on all ports.
+! b. Set each trunk’s native VLAN to VLAN 1000 (unused).
+! c. In Office A, allow VLANs 10, 20, 40, and 99 on all trunks.
+! d. In Office B, allow VLANs 10, 20, 30, and 99 on all trunks.
+int range g0/1-2
+switchport mode trunk
+switchport nonegotiate
+switchport trunk native vlan 1000
+switchport trunk allowed vlan 10,20,40,99
+exit
+
+! 4. Configure one of each office’s Distribution switches as a VTPv2 server. Use domain name JeremysITLab.
+! a. Verify that other switches join the domain.
+! b. Configure all Access switches as VTP clients.
+vtp mode client
+
+! 7. Configure each Access switch’s access port. 
+! a. LWAPs will not use FlexConnect
+! b. PCs in VLAN 10, Phones in VLAN 20
+! c. SRV1 in VLAN 30
+! d. Manually configure access mode and explicitly disable DTP
+int f0/1
+switchport mode access
+switchport access vlan 10
+switchport voice vlan 20
+switchport nonegotiate
+
+! 9. Administratively disable all unused ports on Access and Distribution switches.
+int range f0/2-24
+shut
+do wri

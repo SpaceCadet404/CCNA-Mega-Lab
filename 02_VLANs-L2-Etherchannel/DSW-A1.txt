@@ -1,0 +1,45 @@
+! Configure a Layer-2 EtherChannel named PortChannel1 between DSW-A1 and DSW-A2 using a Cisco-proprietary protocol. 
+! Both switches should actively try to form an EtherChannel.
+enable
+config terminal
+int range g1/0/4-5
+channel-group 1 mode desirable
+
+! 3. Configure all links between Access and Distribution switches, including the EtherChannels, as trunk links.
+! a. Explicitly disable DTP on all ports.
+! b. Set each trunk’s native VLAN to VLAN 1000 (unused).
+! c. In Office A, allow VLANs 10, 20, 40, and 99 on all trunks.
+! d. In Office B, allow VLANs 10, 20, 30, and 99 on all trunks.
+int range g1/0/1-3
+switchport mode trunk
+switchport nonegotiate
+switchport trunk native vlan 1000
+switchport trunk allowed vlan 10,20,40,99
+
+! 4. Configure one of each office’s Distribution switches as a VTPv2 server. Use domain name JeremysITLab.
+! a. Verify that other switches join the domain.
+! b. Configure all Access switches as VTP clients.
+vtp domain JeremysITLab
+vtp mode server
+vtp version 2
+
+! 5. In Office A, create and name the following VLANs on one of the Distribution switches. Ensure that VTP propagates the changes.
+! a. VLAN 10: PCs
+! b. VLAN 20: Phones
+! c. VLAN 40: Wi-Fi
+! d. VLAN 99: Management
+vlan 10
+name PCs
+vlan 20
+name Phones
+vlan 40
+name Wi-Fi
+vlan 99
+name Management
+
+! 9. Administratively disable all unused ports on Access and Distribution switches.
+int range g1/0/6-24
+shut
+int range g1/1/3-4
+shut
+do write
